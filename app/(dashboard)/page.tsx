@@ -1,4 +1,5 @@
 import { GetFormStats } from '@/actions/form';
+import CreateFormButton from '@/components/CreateFormButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,9 +16,12 @@ export default function Home() {
       <h2 className="text-4xl font-bold col-span-2">Your forms</h2>
       <Separator className="my-6" />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <FormCardSkeleton/>
-        <FormCardSkeleton/>
-        <FormCardSkeleton/>
+        <CreateFormButton />
+        <Suspense
+          fallback={[1, 2, 3, 4].map((el) => (
+            <FormCardSkeleton key={el} />
+          ))}>
+        </Suspense>
       </div>
     </div>
   )
@@ -111,6 +115,6 @@ export function StatsCard({
 
 function FormCardSkeleton() {
   return (
-    <Skeleton className='border-2 border-primary-/20 h-[190px] w-full'/>
+    <Skeleton className='border-2 border-primary-/20 h-[190px] w-full' />
   )
 }
