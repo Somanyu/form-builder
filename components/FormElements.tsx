@@ -12,7 +12,9 @@ export type FormElement = {
         label: string;
     };
 
-    designerComponent: React.FC;
+    designerComponent: React.FC<{
+        elementInstance: FormElementsInstance
+    }>;
     formComponent: React.FC;
     propertiesComponent: React.FC;
 }
