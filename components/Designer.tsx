@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 
 const Designer = () => {
 
-    const { elements, addElement, selectedElement, setSelectedElement } = useDesigner();
+    const { elements, addElement, removeElement, selectedElement, setSelectedElement } = useDesigner();
 
     const droppable = useDroppable({
         id: "designer-drop-area",
@@ -28,20 +28,82 @@ const Designer = () => {
             if (!active || !over) return
 
             const isDesignerBtnElement = active.data?.current?.isDesignerBtnElement
+            const isDroppingOverDesignerDropArea = over.data?.current?.isDesignerDropArea;
 
-            if (isDesignerBtnElement) {
+            const droppingSidebarBtnOverDesignerDropArea = isDesignerBtnElement && isDroppingOverDesignerDropArea;
+
+            // First scenario: dropping a sidebar btn element over the designer drop area
+            if (droppingSidebarBtnOverDesignerDropArea) {
                 const type = active.data?.current?.type as ElementsType
                 const newElement = FormElements[type].construct(idGenerator())
 
-                addElement(0, newElement)
+                addElement(elements.length, newElement)
+                return;
             }
+
+            const isDroppingOverDesignerElementTopHalf = over.data?.current?.isTopHalfDesignerElement
+            const isDroppingOverDesignerElementBottomHalf = over.data?.current?.isBottomHalfDesignerElement
+
+            const isDroppingOverDesignerElement = isDroppingOverDesignerElementTopHalf || isDroppingOverDesignerElementBottomHalf;
+
+            const droppingSidebarBtnOverDesignerElement = isDesignerBtnElement && isDroppingOverDesignerElement;
+
+            // Second scenario: dropping a sidebar btn element over a designer element
+            if (droppingSidebarBtnOverDesignerElement) {
+                const type = active?.data?.current?.type;
+                const newElement = FormElements[type as ElementsType].construct(idGenerator())
+
+                const overId = over.data?.current?.elementId
+
+                const overElementIndex = elements.findIndex((el) => el.id === overId);
+                if (overElementIndex === -1) {
+                    throw new Error("Element not found");
+                }
+
+                let indexForNewElement = overElementIndex;
+                if (isDroppingOverDesignerElementBottomHalf) {
+                    indexForNewElement = overElementIndex + 1;
+                }
+
+                addElement(indexForNewElement, newElement);
+                return;
+            }
+
+            // Third scenario: dropping a designer element over the designer drop area
+            const isDraggingDesignerElement = active.data?.current?.isDesignerElement;
+
+            const draggingDesignerElementOverAnotherDesignerElement = isDroppingOverDesignerElement && isDraggingDesignerElement;
+
+            if (draggingDesignerElementOverAnotherDesignerElement) {
+                const activeId = active.data?.current?.elementId;
+                const overId = over.data?.current?.elementId;
+
+                const activeElementIndex = elements.findIndex((el) => el.id === activeId);
+                const overElementIndex = elements.findIndex((el) => el.id === overId);
+
+                if (activeElementIndex === -1 || overElementIndex === -1) {
+                    throw new Error("Element not found");
+                }
+
+                const activeElement = { ...elements[activeElementIndex] };
+                removeElement(activeId)
+
+                let indexForNewElement = overElementIndex;
+                if (isDroppingOverDesignerElementBottomHalf) {
+                    indexForNewElement = overElementIndex + 1;
+                }
+
+                addElement(indexForNewElement, activeElement);
+
+            }
+
         },
     })
 
     return (
         <div className="flex w-full h-full">
-            <div className="p-4 w-full" onClick={()=>{
-                if(selectedElement) setSelectedElement(null)
+            <div className="p-4 w-full" onClick={() => {
+                if (selectedElement) setSelectedElement(null)
             }}>
                 <div
                     ref={droppable.setNodeRef}
