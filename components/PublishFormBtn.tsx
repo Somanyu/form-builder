@@ -1,8 +1,33 @@
-import { CheckIcon } from "@radix-ui/react-icons"
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog"
+import { PublishForm } from "@/actions/form"
+import { CheckIcon, UpdateIcon } from "@radix-ui/react-icons"
+import { useRouter } from "next/navigation"
+import { useTransition } from "react"
+import { FaIcons } from "react-icons/fa"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog"
 import { Button } from "./ui/button"
+import { toast } from "./ui/use-toast"
 
 const PublishFormBtn = ({ id }: { id: number }) => {
+
+    const [loading, startTransition] = useTransition();
+    const router = useRouter();
+
+    async function publishForm() {
+        try {
+            await PublishForm(id)
+            toast({
+                title: "Success",
+                description: "Your form is now available to the public.",
+            })
+            router.refresh();
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Something went wrong.",
+            })
+        }
+    }
+
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -26,9 +51,17 @@ const PublishFormBtn = ({ id }: { id: number }) => {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>
-                        Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        disabled={loading}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            startTransition(publishForm)
+                        }}
+                    >
+                        Proceed
+                        {loading && <UpdateIcon className="animate-spin ml-2" />}
+                    </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

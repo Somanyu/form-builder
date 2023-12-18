@@ -5,7 +5,7 @@ import { FormElementsInstance } from "../FormElements";
 
 type DesignerContextType = {
     elements: FormElementsInstance[];
-    // setElements: Dispatch<SetStateAction<FormElementsInstance[]>>;
+    setElements: Dispatch<SetStateAction<FormElementsInstance[]>>;
     addElement: (index: number, element: FormElementsInstance) => void;
     removeElement: (id: string) => void;
 
@@ -46,7 +46,7 @@ export default function DesignerContextProvider({ children }: { children: ReactN
         <DesignerContext.Provider
             value={{
                 elements,
-                // setElements,
+                setElements,
                 addElement,
                 removeElement,
 
