@@ -7,7 +7,7 @@ export type SubmitFunction = (key: string, value: string) => void;
 export type FormElement = {
     type: ElementsType;
 
-    construct: (id:string) => FormElementsInstance;
+    construct: (id: string) => FormElementsInstance;
 
     designerBtnElement: {
         icon: React.ElementType;
@@ -18,9 +18,12 @@ export type FormElement = {
         elementInstance: FormElementsInstance
     }>;
     formComponent: React.FC<
-    {
-        elementInstance: FormElementsInstance,
-    }>;
+        {
+            elementInstance: FormElementsInstance,
+            submitValue?: SubmitFunction,
+            isInvalid?: boolean,
+            defaultValue?: string,
+        }>;
     propertiesComponent: React.FC<{
         elementInstance: FormElementsInstance
     }>;

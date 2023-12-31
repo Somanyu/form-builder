@@ -208,7 +208,7 @@ function DesignerElementWrapper({ element }: { element: FormElementsInstance }) 
                             </Button>
                         </div>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse">
-                            <p className="text-white text-lg">Click for properties or drag to move</p>
+                            <p className="text-lg text-foreground">Click for properties or drag to move</p>
                         </div>
                     </>
                 )
