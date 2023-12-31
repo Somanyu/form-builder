@@ -2,9 +2,11 @@ import { GetFormById, GetFormWithSubmissions } from "@/actions/form";
 import { ElementsType, FormElementsInstance } from "@/components/FormElements";
 import FormLinkShare from "@/components/FormLinkShare";
 import VisitBtn from "@/components/VisitBtn";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ClockIcon, CursorArrowIcon, EyeOpenIcon, FileTextIcon } from "@radix-ui/react-icons";
-import { formatDistance } from "date-fns";
+import { format, formatDistance } from "date-fns";
 import { ReactNode } from "react";
 import { StatsCard } from "../../page";
 
@@ -105,11 +107,11 @@ async function SubmissionTable({ id }: { id: number }) {
     formElements.forEach((element) => {
         switch (element.type) {
             case "TextField":
-                // case "NumberField":
-                // case "TextAreaField":
-                // case "DateField":
-                // case "SelectField":
-                // case "CheckboxField":
+            case "NumberField":
+            case "TextAreaField":
+            case "DateField":
+            case "SelectField":
+            case "CheckboxField":
                 columns.push({
                     id: element.id,
                     label: element.extraAttributes?.label,
@@ -171,13 +173,14 @@ function RowCell({ type, value }: { type: ElementsType, value: string }) {
     let node: ReactNode = value;
 
     switch (type) {
-        // case "NumberField":
-        //     node = Number(value);
-        //     break;
-        // case "DateField":
-        //     node = new Date(value);
-        //     break;
-        default:
+        case "DateField":
+            if (!value) break;
+            const date = new Date(value);
+            node = <Badge variant={"outline"}>{format(date, "dd/MM/yyyy")}</Badge>;
+            break;
+        case "CheckboxField":
+            const checked = value === "true";
+            node = <Checkbox checked={checked} disabled />;
             break;
     }
 
