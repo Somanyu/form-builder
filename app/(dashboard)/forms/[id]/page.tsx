@@ -2,7 +2,10 @@ import { GetFormById, GetFormWithSubmissions } from "@/actions/form";
 import { ElementsType, FormElementsInstance } from "@/components/FormElements";
 import FormLinkShare from "@/components/FormLinkShare";
 import VisitBtn from "@/components/VisitBtn";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ClockIcon, CursorArrowIcon, EyeOpenIcon, FileTextIcon } from "@radix-ui/react-icons";
+import { formatDistance } from "date-fns";
+import { ReactNode } from "react";
 import { StatsCard } from "../../page";
 
 const FormBuilderPage = async ({ params }: { params: { id: string } }) => {
@@ -26,17 +29,17 @@ const FormBuilderPage = async ({ params }: { params: { id: string } }) => {
     return (
         <>
             <div className="py-10 border-b border-muted">
-                <div className="flex justify-between container">
+                <div className="flex justify-between">
                     <h1 className="text-4xl font-bold truncate">{form.name}</h1>
                     <VisitBtn shareUrl={form.shareURL} />
                 </div>
             </div>
             <div className="py-4 border-b border-muted">
-                <div className="container flex gap-2 items-center justify-between">
+                <div className=" flex gap-2 items-center justify-between">
                     <FormLinkShare shareUrl={form.shareURL} />
                 </div>
             </div>
-            <div className="w-full pt-8 gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container">
+            <div className="w-full pt-8 gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 <StatsCard
                     title="Total visits"
                     icon={<EyeOpenIcon className="text-blue-600" />}
@@ -130,8 +133,54 @@ async function SubmissionTable({ id }: { id: number }) {
 
     return (
         <>
-            <div className="text-2xl font-bold my-4">Submissions</div>
+            <h1 className="text-2xl font-bold my-4">Submissions</h1>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {columns.map((column) => (
+                                <TableHead key={column.id} className="uppercase">
+                                    {column.label}
+                                </TableHead>
+                            ))}
+                            <TableHead className="text-muted-foreground text-right uppercase">Submitted at</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {rows.map((row, index) => (
+                            <TableRow key={index}>
+                                {columns.map((column) => (
+                                    <RowCell key={column.id} type={column.type} value={row[column.id]} />
+                                ))}
+                                <TableCell className="text-muted-foreground text-right">
+                                    {formatDistance(row.submittedAt, new Date(), {
+                                        addSuffix: true,
+                                    })}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </>
     )
+
+}
+
+function RowCell({ type, value }: { type: ElementsType, value: string }) {
+    let node: ReactNode = value;
+
+    switch (type) {
+        // case "NumberField":
+        //     node = Number(value);
+        //     break;
+        // case "DateField":
+        //     node = new Date(value);
+        //     break;
+        default:
+            break;
+    }
+
+    return <TableCell>{node}</TableCell>
 
 }
